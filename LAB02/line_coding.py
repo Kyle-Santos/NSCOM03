@@ -1,7 +1,7 @@
+# 2.1 Coding Signals: Line Coding (Signal elements vs data element)
 import matplotlib.pyplot as plt
 import numpy as np
 
-# 2.1 Coding Signals: Line Coding (Signal elements vs data element)
 def draw_digital(values, figsize=(6,2), title=""):
     # Create time points for each value
     time = np.linspace(0, 1, len(values))
@@ -48,3 +48,19 @@ draw_digital(values, (6,3))
 # 6.5.2
 values = [2, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0]
 draw_digital(values, (6,3))
+
+# 6.2.1
+values = [1, 0, 1, 1, 0, 0, 0, 1] # Digital signal values
+draw_digital(values)
+
+# 6.2.2
+values = [1, 0, 0, 0, 1, 0, 1, 1] # Digital signal values
+draw_digital(values)
+
+# 6.4
+values = [0, 0.5, 1, 0.5, 0, 0.5, 0, 0.5, 1, 0.5, 1] # Digital signal values
+draw_digital(values)
+
+# 7.1
+values = [0.5, 1, 0.5, 0.5, 0, 0.5] # Digital signal values
+draw_digital(values)
