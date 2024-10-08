@@ -22,11 +22,11 @@ def draw_digital(values, figsize=(6,2), title=""):
     plt.show()
 
 # 2.1.1
-values = [2, 0, 1, 0, 2]
+values = [1, 0, 1, 0, 1]
 draw_digital(values)
 
 # 2.1.2
-values = [2, 0, 1, 0, 1, 0, 1]
+values = [1, 0, 1, 0, 1, 0, 1, 1]
 draw_digital(values)
 
 # 2.1.3
