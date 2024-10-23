@@ -1,3 +1,5 @@
+from tabulate import tabulate
+
 def calculate_parity(data, parity_type='even'):
     parity_bit = 0
     for bit in data:
@@ -18,9 +20,15 @@ def main():
     # Calculate odd parity
     odd_parity = calculate_parity(data, 'odd')
 
-    print(f"Data: {data}")
-    print(f"Even Parity Bit: {even_parity}")
-    print(f"Odd Parity Bit: {odd_parity}")
+    # Prepare data for table
+    table_data = [
+        ["Data", data],
+        ["Even Parity Bit", even_parity],
+        ["Odd Parity Bit", odd_parity]
+    ]
+
+    # Print table
+    print(tabulate(table_data, headers=["Description", "Value"], tablefmt="grid"))
 
 if __name__ == "__main__":
     main()
