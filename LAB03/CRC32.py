@@ -7,7 +7,7 @@ def crc32(frame, generator):
     frame_int <<= 32
 
     # Perform polynomial division
-    for i in range(frame.bit_length() - 1, -1, -1):
+    for i in range(frame_int.bit_length() - 1, -1, -1):
         if frame_int & (1 << (i + 32 - 1)):
             frame_int ^= generator_int << (i)
 
@@ -35,5 +35,5 @@ def main():
     print(f"CRC-32 Checksum: {crc_checksum}")
     print(f"Transmitted Frame: {transmitted_frame}")
 
-if __name__ == "__main__":
-    main()
+
+main()
