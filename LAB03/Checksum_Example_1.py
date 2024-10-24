@@ -1,3 +1,6 @@
+import socket
+import struct
+
 def ones_complement(n, bits=4):
     """Calculate the one's complement of a number."""
     return n ^ ((1 << bits) - 1)
@@ -6,12 +9,12 @@ def wrap_sum(sum_value, bits=4):
     """Wrap the sum to fit within the specified number of bits."""
     bin_sum = bin(sum_value)[2:]
 
-    if len(bin_sum) > 4:
-      first_2_bits = int(bin_sum[:2], 2)
-      last_bits = int(bin_sum[2:], 2)
-      wrapped_sum = first_2_bits + last_bits
+    if len(bin_sum) > bits:
+        first_bits = int(bin_sum[:-bits], 2)
+        last_bits = int(bin_sum[-bits:], 2)
+        wrapped_sum = first_bits + last_bits
     else:
-      wrapped_sum = int(bin_sum)
+        wrapped_sum = int(bin_sum, 2)
 
     return wrapped_sum
 
@@ -33,20 +36,51 @@ def verify_checksum(data_with_checksum):
     calculated_checksum = ones_complement(wrapped_total)
     return calculated_checksum
 
-data = [7, 11, 12, 0, 6]
-print(f"Given: {data}")
+def sender(data, host='localhost', port=12345):
+    # Calculate checksum
+    checksum = calculate_checksum(data)
+    data_with_checksum = data + [checksum]
 
-# Calculate checksum
-checksum = calculate_checksum(data)
+    # Create a socket and connect to the receiver
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((host, port))
+        print("Sender: Connected to receiver")
 
-data_with_checksum = data + [checksum]
+        # Send data with checksum
+        packed_data = struct.pack(f'{len(data_with_checksum)}B', *data_with_checksum)
+        s.sendall(packed_data)
+        print("Sender: Data sent")
 
-# Print the data with checksum
-print("Data with checksum:", data_with_checksum)
+def receiver(host='localhost', port=12345):
+    # Create a socket and bind to the address
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind((host, port))
+        s.listen()
+        print("Receiver: Listening for connections")
 
-# Verify checksum
-calculated_checksum = verify_checksum(data_with_checksum)
+        conn, addr = s.accept()
+        with conn:
+            print(f"Receiver: Connected by {addr}")
+            data = conn.recv(1024)
+            unpacked_data = list(struct.unpack(f'{len(data)}B', data))
+            print(f"Receiver: Received data: {unpacked_data}")
 
-# Print the result of checksum verification
-print(f"Checksum: {calculated_checksum}")
-print(f"Checksum valid: {True if not calculated_checksum else False}")
+            # Verify checksum
+            calculated_checksum = verify_checksum(unpacked_data)
+            print(f"Receiver: Calculated checksum: {calculated_checksum}")
+            print(f"Receiver: Checksum valid: {True if not calculated_checksum else False}")
+
+if __name__ == "__main__":
+    data = [7, 11, 12, 0, 6]
+    print(f"Given: {data}")
+
+    # Start the receiver in a separate thread or process
+    import threading
+    receiver_thread = threading.Thread(target=receiver)
+    receiver_thread.start()
+
+    # Start the sender
+    sender(data)
+
+    # Wait for the receiver thread to finish
+    receiver_thread.join()
