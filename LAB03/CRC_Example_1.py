@@ -1,24 +1,21 @@
 def crc_calculation(frame, generator):
-    # Append 4 zero bits to the frame
-    frame += '0' * 4
+    # Append zero bits to the frame
+    frame += '0' * (len(generator) - 1)
 
-    # Convert frame and generator to integers
-    frame_int = int(frame, 2)
-    generator_int = int(generator, 2)
+    # Convert frame and generator to lists of bits
+    frame_bits = list(map(int, frame))
+    generator_bits = list(map(int, generator))
 
     # Perform polynomial division
-    for i in range(len(frame) - 4):
-        if frame_int & (1 << (len(frame) - 1)):
-            frame_int ^= generator_int
-        frame_int <<= 1
+    for i in range(len(frame_bits) - len(generator_bits) + 1):
+        if frame_bits[i] == 1:
+            for j in range(len(generator_bits)):
+                frame_bits[i + j] ^= generator_bits[j]
 
     # Extract the remainder (CRC)
-    remainder = frame_int & ((1 << 4) - 1)
+    remainder = ''.join(map(str, frame_bits[-(len(generator) - 1):]))
 
-    # Convert remainder to binary string
-    remainder_str = format(remainder, '04b')
-
-    return remainder_str
+    return remainder
 
 def main():
     # Example frame and generator
@@ -33,7 +30,7 @@ def main():
 
     print(f"Frame: {frame}")
     print(f"Generator: {generator}")
-    print(f"Message after 4 zero bits are appended: {frame + '0' * 4}")
+    print(f"Message after {len(generator) - 1} zero bits are appended: {frame + '0' * (len(generator) - 1)}")
     print(f"Remainder: {crc}")
     print(f"Transmitted Frame: {transmitted_frame}")
 
